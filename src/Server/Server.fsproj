@@ -23,8 +23,11 @@
     <Compile Include="Api.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.fsproj" />
+    <ProjectReference Include="..\..\..\realsharpino\Sharpino\Sharpino.Lib\Sharpino.Lib.fsproj" />
   </ItemGroup>
+
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

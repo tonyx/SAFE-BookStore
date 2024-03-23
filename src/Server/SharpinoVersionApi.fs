@@ -16,7 +16,7 @@ module SharpinoApi =
     open Shared
     let connection =
         "Server=127.0.0.1;"+
-        "Database=es_pub_sharpino;" +
+        "Database=safe_sharpino_lib;" +
         "User Id=safe;"+
         "Password=safe;"
 
@@ -29,6 +29,7 @@ module SharpinoApi =
             }
 
         member this.AddBook (userName: UserName, book: Book) =
+            printf "adding book: %A\n" book
             ResultCE.result {
                 let command = AddBook (userName, book)
                 let! result = runCommand<Library, LibraryEvents> eventStore doNothingBroker libraryStateViewer command

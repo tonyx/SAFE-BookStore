@@ -24,7 +24,7 @@ module Library =
             "_01"
 
         static member SnapshotsInterval =
-            10
+            3
 
         static member Lock =
             new Object()
@@ -63,7 +63,6 @@ module Library =
                     wishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
                 | None -> wishLists
             Library (books, newWithList) |> Ok
-
 
         member this.GetWishList (userName: UserName) =
             let wishList =
