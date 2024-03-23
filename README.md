@@ -1,3 +1,10 @@
+# SAFE Bookstore with Sharpino back end
+
+The example of SAFE Bookstore uses Sharpino in its back end.
+
+
+What follows is the original README.md content.
+
 # Introducing SAFE Bookstore
 
 [Deployed Demo](https://safebookstore.azurewebsites.net/)
