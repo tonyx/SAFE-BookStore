@@ -37,20 +37,33 @@ module Library =
             |> serializer.Serialize
 
         member this.AddBook (username: UserName, book: Book) =
-            let newBooks =
-                match this.Books.TryFind username with
-                | Some books -> book :: books
-                | None -> [book]
-            let newBooksMap = this.Books.Add(username, newBooks)
-            Library (newBooksMap, wishLists) |> Ok
+            let userWishList = wishLists |> List.tryFind (fun wl -> wl.UserName = username)
+            let newWithList =
+                match userWishList with
+                | Some userWishList ->
+                    let result = userWishList.VerifyNewBookIsNotADuplicate book
+                    match result with
+                    | Ok book ->
+                        let newBooks = book :: userWishList.Books
+                        let newWishList = { userWishList with Books = newBooks }
+                        wishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
+                    | Error _ -> wishLists
+                | None ->
+                    let newWishList = { UserName = username; Books = [book] }
+                    newWishList :: wishLists
+            Library (books, newWithList) |> Ok
 
         member this.RemoveBook (username: UserName, title: string) =
-            let newBooks =
-                match this.Books.TryFind username with
-                | Some books -> books |> List.filter (fun b -> b.Title <> title)
-                | None -> []
-            let newBooksMap = this.Books.Add(username, newBooks)
-            Library (newBooksMap, wishLists) |> Ok
+            let userWishList = wishLists |> List.tryFind (fun wl -> wl.UserName = username)
+            let newWithList =
+                match userWishList with
+                | Some userWishList ->
+                    let newBooks = userWishList.Books |> List.filter (fun b -> b.Title <> title)
+                    let newWishList = { userWishList with Books = newBooks }
+                    wishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
+                | None -> wishLists
+            Library (books, newWithList) |> Ok
+
 
         member this.GetWishList (userName: UserName) =
             let wishList =

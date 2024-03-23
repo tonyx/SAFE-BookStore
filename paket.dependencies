@@ -2,9 +2,7 @@ source https://api.nuget.org/v3/index.json
 framework: net8.0
 storage: none
 
-nuget Azure.Data.Tables
 nuget Azure.Identity
-nuget Azure.Storage.Blobs
 nuget Elmish.SweetAlert
 nuget Expecto
 nuget Feliz.DaisyUI
