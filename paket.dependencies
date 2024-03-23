@@ -6,18 +6,20 @@ nuget Azure.Data.Tables
 nuget Azure.Identity
 nuget Azure.Storage.Blobs
 nuget Elmish.SweetAlert
+nuget Expecto
 nuget Feliz.DaisyUI
 nuget Feliz.Router
 nuget Feliz.UseElmish
 nuget FSharp.Core ~> 8
 nuget Fable.Remoting.Giraffe ~> 5
+nuget FSharpPlus
 nuget FSToolkit.ErrorHandling
 nuget Microsoft.ApplicationInsights.AspNetCore
 nuget Microsoft.Extensions.Azure
+nuget NETStandard.Library
 nuget Quartz
 nuget Quartz.Extensions.Hosting
 nuget Saturn ~> 0
-nuget Expecto ~> 9
 
 nuget Fable.Core ~> 4
 nuget Fable.Elmish ~> 4
@@ -31,3 +33,4 @@ nuget Feliz ~> 2
 nuget Fake.Core.Target ~> 5
 nuget Fake.IO.FileSystem ~> 5
 nuget Farmer ~> 1
+nuget Sharpino

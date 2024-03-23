@@ -4,14 +4,22 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <None Include="appSettings.json" CopyToOutputDirectory="PreserveNewest" />
+
     <Compile Include="SAFE.fs" />
     <Compile Include="Authorise.fs" />
     <Compile Include="Storage.fs" />
-    <Compile Include="Azure.fs" />
-    <Compile Include="Jobs.fs" />
+    <Compile Include="Library/Library.fs" />
+    <Compile Include="Library/Events.fs" />
+
+    <Compile Include="Library/Commands.fs" />
+    <Compile Include="SharpinoVersionApi.fs" />
+    <!-- <Compile Include="Azure.fs" /> -->
+    <!-- <Compile Include="Jobs.fs" /> -->
     <Compile Include="Api.fs" />
     <Compile Include="Server.fs" />
   </ItemGroup>

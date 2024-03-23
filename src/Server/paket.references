@@ -9,3 +9,7 @@ Microsoft.Extensions.Azure
 Quartz
 Quartz.Extensions.Hosting
 Microsoft.ApplicationInsights.AspNetCore
+Sharpino
+FSharpPlus
+FsToolkit.ErrorHandling
+Sharpino.Core
