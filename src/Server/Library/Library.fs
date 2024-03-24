@@ -13,9 +13,14 @@ module Library =
         let stateId = Guid.NewGuid()
         member this.StateId = stateId
         member this.Books = books
+        member this.WishLists =
+            // strange thing todo but it is needed
+            match box wishLists with
+            | null -> []
+            | _ -> wishLists
 
         static member Zero =
-            Library([] |> Map.ofList, [])
+            Library([] |> Map.ofList, []:> List<WishList>)
 
         static member StorageName =
             "_library"
@@ -37,7 +42,7 @@ module Library =
             |> serializer.Serialize
 
         member this.AddBook (username: UserName, book: Book) =
-            let userWishList = wishLists |> List.tryFind (fun wl -> wl.UserName = username)
+            let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
             let newWithList =
                 match userWishList with
                 | Some userWishList ->
@@ -46,27 +51,28 @@ module Library =
                     | Ok book ->
                         let newBooks = book :: userWishList.Books
                         let newWishList = { userWishList with Books = newBooks }
-                        wishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
-                    | Error _ -> wishLists
+                        this.WishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
+                    | Error _ ->
+                        this.WishLists
                 | None ->
                     let newWishList = { UserName = username; Books = [book] }
-                    newWishList :: wishLists
+                    newWishList :: this.WishLists
             Library (books, newWithList) |> Ok
 
         member this.RemoveBook (username: UserName, title: string) =
-            let userWishList = wishLists |> List.tryFind (fun wl -> wl.UserName = username)
+            let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
             let newWithList =
                 match userWishList with
                 | Some userWishList ->
                     let newBooks = userWishList.Books |> List.filter (fun b -> b.Title <> title)
                     let newWishList = { userWishList with Books = newBooks }
-                    wishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
-                | None -> wishLists
+                    this.WishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
+                | None -> this.WishLists
             Library (books, newWithList) |> Ok
 
         member this.GetWishList (userName: UserName) =
             let wishList =
-                wishLists
+                this.WishLists
                 |> List.tryFind (fun wl -> wl.UserName = userName)
                 |> Option.map (fun wl -> wl.Books)
                 |> Option.defaultValue []
