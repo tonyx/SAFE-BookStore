@@ -2,11 +2,8 @@
 namespace SharpinoLibrary
 open SharpinoLibrary.Library
 open SharpinoLibrary.LibraryEvents
-open Sharpino.Definitions
-open Sharpino.Utils
 open Sharpino.Core
 open Shared
-open System
 
 module  LibraryCommands =
     type LibraryCommands =

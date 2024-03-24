@@ -11,9 +11,6 @@ let webApp =
     // choose [ Api.create Api.guestApi; authenticated >=> Api.create Api.wishlistApi ]
     choose [ Api.create Api.guestApi; authenticated >=> Api.create Api.sharpinoWishlistApi ]
 
-// let configureServices =
-//     Azure.addAppInsights >> Azure.addAzureStorage >> Jobs.addResetStorageJob
-
 let app = application {
     use_router webApp
     // service_config configureServices
