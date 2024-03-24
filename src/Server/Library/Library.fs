@@ -8,18 +8,17 @@ open System
 open Shared
 
 module Library =
-    // type Library(books: Map<UserName, List<Book>>, wishLists: List<WishList> ) =
     type Library(wishLists: List<WishList> ) =
         let stateId = Guid.NewGuid()
         member this.WishLists =
-            // strange thing todo but it is needed
+            // strange thing to do but it is needed
             match box wishLists with
             | null -> []
             | _ -> wishLists
 
         member this.AddBook (username: UserName, book: Book) =
             let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
-            let newWithList =
+            let newWishList =
                 match userWishList with
                 | Some userWishList ->
                     let result = userWishList.VerifyNewBookIsNotADuplicate book
@@ -33,7 +32,7 @@ module Library =
                 | None ->
                     let newWishList = { UserName = username; Books = [book] }
                     newWishList :: this.WishLists
-            Library (newWithList) |> Ok
+            Library (newWishList) |> Ok
 
         member this.RemoveBook (username: UserName, title: string) =
             let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
