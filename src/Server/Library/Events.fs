@@ -9,13 +9,11 @@ open System
 module LibraryEvents =
     type LibraryEvents =
 
-        | BookAdded of UserName * Book
-        | BookRemoved of UserName * string
+        | UserRefAdded of UserName * Guid
             interface Event<Library> with
                 member this.Process (library: Library) =
                     match this with
-                    | BookAdded (userName, book) -> library.AddBook (userName, book)
-                    | BookRemoved (username, title) -> library.RemoveBook (username, title)
+                    | UserRefAdded (userName, id) -> library.AddUserRef (userName, id)
 
         static member Deserialize (serializer: ISerializer, json: Json): Result<LibraryEvents, string> =
             serializer.Deserialize<LibraryEvents> json

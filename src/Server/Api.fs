@@ -1,7 +1,5 @@
 ﻿module Api
 
-// open Azure.Data.Tables
-// open Azure.Storage.Blobs
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Microsoft.AspNetCore.Http
@@ -11,8 +9,6 @@ open Storage
 open System
 open SharpinoVersionApi.SharpinoApi
 open Sharpino.Storage
-open Sharpino
-open Sharpino.EventStore
 open Sharpino.MemoryStorage
 open Sharpino.PgStorage
 

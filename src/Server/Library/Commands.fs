@@ -4,16 +4,14 @@ open SharpinoLibrary.Library
 open SharpinoLibrary.LibraryEvents
 open Sharpino.Core
 open Shared
+open System
 
 module  LibraryCommands =
     type LibraryCommands =
-        | AddBook of UserName * Book
-        | RemoveBook of UserName* string
+        | AddUserRef of (UserName * Guid)
             interface Command<Library, LibraryEvents> with
                 member this.Execute (library: Library) =
                     match this with
-                    | AddBook (userName, book) ->
-                        library.AddBook (userName, book) |> Result.map (fun _ -> [BookAdded (userName, book)])
-                    | RemoveBook (userName, title) ->
-                        library.RemoveBook (userName, title) |> Result.map (fun _ -> [BookRemoved (userName, title)])
+                    | AddUserRef (userName, id) ->
+                        library.AddUserRef (userName, id) |> Result.map (fun _ -> [UserRefAdded (userName, id)])
                 member this.Undoer = None

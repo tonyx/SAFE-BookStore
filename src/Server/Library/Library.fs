@@ -8,50 +8,40 @@ open System
 open Shared
 
 module Library =
-    type Library(wishLists: List<WishList> ) =
+    type Library(wishListAggregatesRefs: Map<UserName, Guid> ) =
         let stateId = Guid.NewGuid()
-        member this.WishLists =
+
+        member this.WishListAggregatesRefs =
             // strange thing to do but it is needed
-            match box wishLists with
-            | null -> []
-            | _ -> wishLists
+            match box wishListAggregatesRefs with
+            | null -> Map.empty
+            | _ -> wishListAggregatesRefs
 
-        member this.AddBook (username: UserName, book: Book) =
-            let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
-            let newWishList =
-                match userWishList with
-                | Some userWishList ->
-                    let result = userWishList.VerifyNewBookIsNotADuplicate book
-                    match result with
-                    | Ok book ->
-                        let newBooks = book :: userWishList.Books
-                        let newWishList = { userWishList with Books = newBooks }
-                        this.WishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
-                    | Error _ ->
-                        this.WishLists
+        member this.AddUserRef (userName: UserName, whishListAggregateId: Guid) =
+            // let newRef = Guid.NewGuid()
+            ResultCE.result
+                {
+                    let userExists = this.WishListAggregatesRefs.ContainsKey userName
+                    let! shouldNotExist =
+                        userExists
+                        |> not
+                        |> Result.ofBool "user already exists"
+                    let newRefs = this.WishListAggregatesRefs.Add(userName, whishListAggregateId)
+                    return Library(newRefs)
+                }
+
+        member this.TryGetUserWishListAggregateId (userName: UserName) =
+            let userRef = this.WishListAggregatesRefs.TryFind userName
+            userRef
+        member this.GetUserWishlListAggregateId (userName: UserName) =
+            ResultCE.result {
+                let userRef = this.WishListAggregatesRefs.TryFind userName
+                match userRef with
+                | Some userRef ->
+                    return userRef
                 | None ->
-                    let newWishList = { UserName = username; Books = [book] }
-                    newWishList :: this.WishLists
-            Library (newWishList) |> Ok
-
-        member this.RemoveBook (username: UserName, title: string) =
-            let userWishList = this.WishLists |> List.tryFind (fun wl -> wl.UserName = username)
-            let newWithList =
-                match userWishList with
-                | Some userWishList ->
-                    let newBooks = userWishList.Books |> List.filter (fun b -> b.Title <> title)
-                    let newWishList = { userWishList with Books = newBooks }
-                    this.WishLists |> List.map (fun wl -> if wl.UserName = username then newWishList else wl)
-                | None -> this.WishLists
-            Library (newWithList) |> Ok
-
-        member this.GetWishList (userName: UserName) =
-            let wishList =
-                this.WishLists
-                |> List.tryFind (fun wl -> wl.UserName = userName)
-                |> Option.map (fun wl -> wl.Books)
-                |> Option.defaultValue []
-            { UserName = userName; Books = wishList}
+                    return! "no user found" |> Error
+            }
 
         member this.GetLastResetTime () =
             DateTime.UtcNow
@@ -60,7 +50,7 @@ module Library =
         member this.StateId = stateId
 
         static member Zero =
-            Library([])
+            Library(Map.empty)
 
         static member StorageName =
             "_library"

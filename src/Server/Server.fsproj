@@ -15,8 +15,10 @@
     <Compile Include="Storage.fs" />
     <Compile Include="Library/Library.fs" />
     <Compile Include="Library/Events.fs" />
-
     <Compile Include="Library/Commands.fs" />
+    <Compile Include="WishLists/WishList.fs" />
+    <Compile Include="WishLists/Events.fs" />
+    <Compile Include="WishLists/Commands.fs" />
     <Compile Include="SharpinoVersionApi.fs" />
     <Compile Include="Api.fs" />
     <Compile Include="Server.fs" />
