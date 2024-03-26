@@ -1,6 +1,11 @@
 # SAFE Bookstore with Sharpino back end
 
-The example of SAFE Bookstore uses Sharpino in its back end.
+this is my work-in-progress take on replacing the backend of the SAFE Bookstore with Sharpino.
+Some calls on the back end happen twice, not sure why yet, and that will make the Sharpino backend fail.
+However, the logic should be correct: The library is a context and the wishlists are proper aggregates.
+interesting fact: I replaced the Newtonsoft.Json with Pickler and it works fine and better because I experienced that some objects are not serializable with Newtonsoft.Json (as far as I remember that happens with F# maps).
+
+Note: This is a fork of the original SAFE Bookstore repository. The original README.md content is preserved at the end of this file.
 
 
 What follows is the original README.md content.
