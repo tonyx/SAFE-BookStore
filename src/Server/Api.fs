@@ -41,6 +41,7 @@ let sharpinoWishlistApi (context: HttpContext) =
                 |  _ -> return { UserName = username; Books = [] }
             }
         addBook = fun (username, book) ->
+            printf "API: Adding book %A\n" book
             async {
                 match sharpinoApi.AddBook (username, book)with
                 | Ok _ -> return book

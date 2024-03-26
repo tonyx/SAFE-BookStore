@@ -9,4 +9,5 @@ Quartz.Extensions.Hosting
 Microsoft.ApplicationInsights.AspNetCore
 FSharpPlus
 FsToolkit.ErrorHandling
-Sharpino
+Newtonsoft.Json
+FsPickler.Json

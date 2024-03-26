@@ -6,9 +6,11 @@ open Sharpino.Utils
 open Sharpino
 open System
 open Shared
+open MBrace.FsPickler.Json
 
 module Library =
-    type Library(wishListAggregatesRefs: Map<UserName, Guid> ) =
+    let pickler = FsPickler.CreateJsonSerializer(indent = false)
+    type Library(wishListAggregatesRefs: Map<string, Guid> ) =
         let stateId = Guid.NewGuid()
 
         member this.WishListAggregatesRefs =
@@ -17,8 +19,7 @@ module Library =
             | null -> Map.empty
             | _ -> wishListAggregatesRefs
 
-        member this.AddUserRef (userName: UserName, whishListAggregateId: Guid) =
-            // let newRef = Guid.NewGuid()
+        member this.AddUserRef (userName: string, whishListAggregateId: Guid) =
             ResultCE.result
                 {
                     let userExists = this.WishListAggregatesRefs.ContainsKey userName
@@ -26,14 +27,15 @@ module Library =
                         userExists
                         |> not
                         |> Result.ofBool "user already exists"
+                    printf "adding user %A\n" userName
                     let newRefs = this.WishListAggregatesRefs.Add(userName, whishListAggregateId)
                     return Library(newRefs)
                 }
 
-        member this.TryGetUserWishListAggregateId (userName: UserName) =
+        member this.TryGetUserWishListAggregateId (userName: string) =
             let userRef = this.WishListAggregatesRefs.TryFind userName
             userRef
-        member this.GetUserWishlListAggregateId (userName: UserName) =
+        member this.GetUserWishlListAggregateId (userName: string) =
             ResultCE.result {
                 let userRef = this.WishListAggregatesRefs.TryFind userName
                 match userRef with
@@ -63,9 +65,14 @@ module Library =
 
         static member Lock =
             new Object()
+        // static member Deserialize (serializer: ISerializer, json: Json): Result<Library, string>  =
+        //     serializer.Deserialize<Library> json
         static member Deserialize (serializer: ISerializer, json: Json): Result<Library, string>  =
-            serializer.Deserialize<Library> json
+            pickler.UnPickleOfString json
+            // serializer.Deserialize<Library> json
 
         member this.Serialize (serializer: ISerializer) =
-            this
-            |> serializer.Serialize
+            pickler.PickleToString this
+        // member this.Serialize (serializer: ISerializer) =
+        //     this
+        //     |> serializer.Serialize

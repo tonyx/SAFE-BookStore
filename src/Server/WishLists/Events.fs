@@ -7,19 +7,27 @@ open Sharpino.Utils
 open Sharpino.Core
 open Shared
 open System
+open MBrace.FsPickler.Json
 
 module WishListEvents =
+    let pickler = FsPickler.CreateJsonSerializer(indent = false)
     type WishListEvents =
         | BookAdded of Book
         | BookRemoved of string
-            interface Event<AggregateWishList> with
-                member this.Process (wishList: AggregateWishList) =
+            interface Event<WishListAggregate> with
+                member this.Process (wishList: WishListAggregate) =
                     match this with
                     | BookAdded book -> wishList.AddBook book
                     | BookRemoved title -> wishList.RemoveBook title
 
         static member Deserialize (serializer: ISerializer, json: Json): Result<WishListEvents, string> =
-            serializer.Deserialize<WishListEvents> json
+            let result = pickler.UnPickleOfString json
+            printf "withlistevent pickler result %A\n" result
+            result |> Ok
+            // Error "asdf"
+            // result
+            // serializer.Deserialize<WishListEvents> json
         member this.Serialize (serializer: ISerializer) =
-            this
-            |> serializer.Serialize
+            pickler.PickleToString this
+            // this
+            // |> serializer.Serialize

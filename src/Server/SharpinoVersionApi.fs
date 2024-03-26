@@ -25,7 +25,7 @@ module SharpinoApi =
 
     type LibraryApi (eventStore: IEventStore) =
         let libraryStateViewer = getStorageFreshStateViewer<Library, LibraryEvents> eventStore
-        let wishListStateViewer = getAggregateStorageFreshStateViewer<AggregateWishList, WishListEvents> eventStore
+        let wishListStateViewer = getAggregateStorageFreshStateViewer<WishListAggregate, WishListEvents> eventStore
 
         let doNothingBroker: IEventBroker =
             {
@@ -35,55 +35,57 @@ module SharpinoApi =
 
         member this.InitUser (userName: UserName, wishListId: Guid) =
             ResultCE.result {
-                let command = AddUserRef (userName, wishListId)
-                let aggregateWishList = AggregateWishList(wishListId, { UserName = userName; Books = [] })
-                let! result = runInitAndCommand<Library, LibraryEvents, AggregateWishList> eventStore doNothingBroker libraryStateViewer aggregateWishList command
+                let command = AddUserRef (userName.Value, wishListId)
+                let aggregateWishList = WishListAggregate(wishListId, { UserName = userName; Books = [] })
+                let! result = runInitAndCommand<Library, LibraryEvents, WishListAggregate> eventStore doNothingBroker libraryStateViewer aggregateWishList command
                 return result
             }
         member this.UserNotExists (userName: UserName) =
             ResultCE.result {
                 let! (_, state, _, _) = libraryStateViewer()
-                let userExists =
-                    state.TryGetUserWishListAggregateId userName
+                let userNotExists =
+                    state.TryGetUserWishListAggregateId userName.Value
                     |> Option.isNone
-                return userExists
+                return userNotExists
             }
         member this.MakeUserIfNotExists (userName: UserName) =
             ResultCE.result {
-                let! userNotExists = this.UserNotExists userName
-                let wishListId = Guid.NewGuid()
-                let! result = this.InitUser (userName, wishListId)
-                return result
+                let! userNotExists =
+                    this.UserNotExists userName
+                if userNotExists then
+                    let wishListId = Guid.NewGuid()
+                    let! result = this.InitUser (userName, wishListId)
+                    return ()
+                else
+                    return ()
             }
         member this.AddBook (userName: UserName, book: Book) =
-            printf "adding book: %A\n" book
             ResultCE.result {
-                let! _ = this.MakeUserIfNotExists userName
+                let _ = this.MakeUserIfNotExists userName
                 let! (_, libraryState, _, _) = libraryStateViewer()
-                let! wishList = libraryState.GetUserWishlListAggregateId userName
+                let! wishList = libraryState.GetUserWishlListAggregateId userName.Value
                 let command = WishListCommands.AddBook book
-                let! result = runAggregateCommand<AggregateWishList, WishListEvents> wishList eventStore doNothingBroker wishListStateViewer command
+                let! result = runAggregateCommand<WishListAggregate, WishListEvents> wishList eventStore doNothingBroker wishListStateViewer command
                 return result
             }
 
         member this.RemoveBook (userName: UserName, title: string) =
             ResultCE.result {
                 let! (_, libraryState, _, _) = libraryStateViewer()
-                let! wishList = libraryState.GetUserWishlListAggregateId userName
+                let! wishList = libraryState.GetUserWishlListAggregateId userName.Value
                 let command = WishListCommands.RemoveBook title
-                let! result = runAggregateCommand<AggregateWishList, WishListEvents> wishList eventStore doNothingBroker wishListStateViewer command
+                let! result = runAggregateCommand<WishListAggregate, WishListEvents> wishList eventStore doNothingBroker wishListStateViewer command
                 return result
             }
 
         member this.GetWishList (userName: UserName) =
             ResultCE.result {
                 let! (_, libraryState, _, _) = libraryStateViewer()
-                let! wishListId = libraryState.GetUserWishlListAggregateId userName
+                let! wishListId = libraryState.GetUserWishlListAggregateId userName.Value
                 let! (_, wishListState, _, _) = wishListStateViewer wishListId
+                let wishList = wishListState.GetWishList()
                 return wishListState.GetWishList()
-
             }
-
 
         member this.GetLastResetTime() =
             ResultCE.result {

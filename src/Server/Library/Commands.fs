@@ -8,7 +8,7 @@ open System
 
 module  LibraryCommands =
     type LibraryCommands =
-        | AddUserRef of (UserName * Guid)
+        | AddUserRef of (string * Guid)
             interface Command<Library, LibraryEvents> with
                 member this.Execute (library: Library) =
                     match this with

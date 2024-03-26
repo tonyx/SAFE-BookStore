@@ -8,8 +8,8 @@ module WishListCommands =
     type WishListCommands =
         | AddBook of Book
         | RemoveBook of string
-            interface Command<AggregateWishList, WishListEvents> with
-                member this.Execute (wishList: AggregateWishList) =
+            interface Command<WishListAggregate, WishListEvents> with
+                member this.Execute (wishList: WishListAggregate) =
                     match this with
                     | AddBook book ->
                         wishList.AddBook book |> Result.map (fun _ -> [BookAdded book])
